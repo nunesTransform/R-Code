@@ -3,6 +3,9 @@
 # author: Simon Müller
 # date: 5.4.2012
 #
+# describtion: i used the unemployment time series from stuttgart to show the 
+# power and beauty of ggplot2  
+#
 #################################################################################
 
 # load libraries
