@@ -1,24 +1,45 @@
-# Bibliotheken
-library(ggplot2)
-library(reshape)
+#################################################################################
+#
+# author: Simon Müller
+# date: 5.4.2012
+#
+#################################################################################
 
-# einlesen
+# load libraries
+library(ggplot2)
+library(reshape2)
+
+
+#################################################################################
+#
+# Loading and preparation of the data
+#
+#################################################################################
+
+# read data in; data cannot be published 
 arbeitslos <- as.data.frame(read.csv("arbeitslose_stgt.csv", sep = ";"))
 
-# benennen
+# new names
 names(arbeitslos) <- c("Jahr", "Gesamt", "<1", "1-3", "3-6", "6-12", "12-24", "<24")
 
-# jahr 2005 rausnehmen, wegen Arbeitsmarktreform
+# clean data; remove data from year jahr 2005 because of the labour market reform
 arbeitslos <- subset(arbeitslos, arbeitslos$Jahr!=2005)
 arbeitslos <- subset(arbeitslos, arbeitslos$Jahr!=2006)
 
-# transformieren
+# transformation of the data
 m.ar <- melt(arbeitslos, id="Jahr")
 m.ar$Jahr <- as.factor(m.ar$Jahr)
 
-# subsets
+# build subsets
 m.ge <- subset(m.ar, m.ar$variable=="Gesamt")
 m.sub <- subset(m.ar, m.ar$variable!="Gesamt")
+
+
+#################################################################################
+#
+# Plotting the data: heatmap, barplot, histogram
+#
+#################################################################################
 
 ###
 #   heatmap
@@ -32,9 +53,8 @@ svg("heatmap.svg")
 dev.off()
 
 ###
-#   bars
+#   barplot
 ###
-
 p <- ggplot(m.sub) +
   geom_bar(aes(x = as.numeric(Jahr) + 1981, y = value, 
                fill = factor(variable)), stat = "identity") + 
@@ -45,24 +65,28 @@ p
 dev.off()
 
 ###
-#   histogramm absolut
+#   histogram absolut
 ###
 p <- ggplot(m.sub) + 
-  geom_area(aes(x = as.numeric(Jahr) + 1981, y = value, fill = factor(variable)), stat = "identity") +
+  geom_area(aes(x = as.numeric(Jahr) + 1981, y = value, 
+                fill = factor(variable)), stat = "identity") +
   xlim(c(1981, 2011)) + xlab("") + ylab("") + 
   scale_fill_brewer("Dauer", palette = "Paired")
 svg("area.svg")
 p
 dev.off()
-###
+
+#################################################################################
 #
-# Anteile ausrechnen
+# Precalculations for graphics with relative values
 #
-###
-gesamt <- apply(arbeitslos[, 3:8], 1, sum) # Gesamtzahl in Statistik stimmt nicht mit Summe überein
+#################################################################################
+
+# Sum in statistics doesn't match with the sum; bad quality
+gesamt <- apply(arbeitslos[, 3:8], 1, sum) 
 arbeitslos[, 3:8] <- apply(arbeitslos[, 3:8], 2, function(x) x / gesamt)
 
-# transformieren
+# transformation
 m.ar <- melt(arbeitslos, id="Jahr")
 m.ar$Jahr <- as.factor(m.ar$Jahr)
 
@@ -71,11 +95,18 @@ m.ge <- subset(m.ar, m.ar$variable=="Gesamt")
 m.sub <- subset(m.ar, m.ar$variable!="Gesamt")
 
 
+#################################################################################
+#
+# Plotting the data: histogram, pie charts
+#
+#################################################################################
+
 ###
-#   histogramm anteil
+#   histogramm relative
 ###
 p <- ggplot(m.sub) + 
-  geom_histogram(aes(x = as.numeric(Jahr) + 1981, y = value, fill = factor(variable)), stat = "identity") +
+  geom_histogram(aes(x = as.numeric(Jahr) + 1981, y = value, 
+                     fill = factor(variable)), stat = "identity") +
   xlim(c(1981, 2011)) + xlab("Jahr") + ylab("Anteil Arbeitslose") + 
   scale_fill_brewer("Dauer", palette = "Paired")
 svg("anteil_hist.svg")
