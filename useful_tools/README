@@ -1,0 +1,2 @@
+ggplot2:
+theme_border.R: Half borders (x/y-axis only) in ggplot2
