@@ -60,7 +60,7 @@ extract_hour <- function(x) {
 # Example with plots and tables
 #
 #################################################################################
-df <- hour_dist("#spd")
+df <- hour_dist("#iran")
 
 ggplot(df) + geom_histogram(aes(x=hourly.count), binwidth=1) + 
   facet_wrap(~date) + xlab("") + ylab("") + xlim(c(0,24))
