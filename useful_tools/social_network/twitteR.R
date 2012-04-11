@@ -2,13 +2,16 @@
 #
 # author: Simon Müller
 # date: 8.4.2012
+# update: 11.4: added wordcloud
 #  
 #
 #################################################################################
 
 # load libraries
-require(twitteR)
+library(twitteR)
 library(ggplot2)
+library(tm)
+library(wordcloud)
 theme_set(theme_bw())
 
 
@@ -17,7 +20,8 @@ theme_set(theme_bw())
 # R function for getting the hourly count of tweets and tweeter
 #
 #################################################################################
-hour_dist <- function(string, n = 1200, days = 5, lang="de", geocode = NULL) {
+hour_dist <- function(string, n = 1200, days = 6, lang = "de", plot = TRUE, 
+                      geocode = NULL, min.freq = 3) {
   
   date <- c()
   hourly.count <- c()
@@ -30,6 +34,11 @@ hour_dist <- function(string, n = 1200, days = 5, lang="de", geocode = NULL) {
       hourly.count <- c(hourly.count, sapply(res$created, extract_hour))
       date <- c(date, rep(as.character(Sys.Date() - i), length(res$created)))
       user <- c(user, res$screenName)
+      if(plot) {
+        myDtm <- word_cloud(res)
+        plot_wc(myDtm, min.freq)
+        X11()
+      }
     }
   }
   tw <- searchTwitter(string, n, lang = lang, since = Sys.Date(), 
@@ -39,6 +48,10 @@ hour_dist <- function(string, n = 1200, days = 5, lang="de", geocode = NULL) {
     hourly.count <- c(hourly.count, sapply(res$created, extract_hour))
     date <- c(date, rep(as.character(Sys.Date()), length(res$created)))
     user <- c(user, res$screenName)
+    if(plot) {
+      myDtm <- word_cloud(res)
+      plot_wc(myDtm, min.freq)
+    }
   }
   
   return(data.frame(date = date, hourly.count = hourly.count, user = user))
@@ -57,10 +70,70 @@ extract_hour <- function(x) {
 
 #################################################################################
 #
-# Example with plots and tables
+# Calculate cloud
 #
 #################################################################################
-df <- hour_dist("#spd")
+word_cloud <- function(data) {
+
+  # calc corpus
+  myCorpus <- Corpus(VectorSource(data$text))
+  
+  # Großbuchstaben -> Kleinbuchstaben
+  myCorpus <- tm_map(myCorpus, tolower)
+  
+  # Lösche Satzzeichen
+  myCorpus <- tm_map(myCorpus, removePunctuation)
+  
+  # Lösche Zahlen
+  myCorpus <- tm_map(myCorpus, removeNumbers)
+  
+  myStopwords <- c(stopwords("german"), "heute", "die", "mehr", "am", "noch", 
+                   "neue", "du", "ab", "ersten", "wir", "das")
+  
+  myCorpus <- tm_map(myCorpus, removeWords, myStopwords)
+  
+  ###
+  #
+  # Wortstamm
+  #
+  ###
+  dictCorpus <- myCorpus
+  myCorpus <- tm_map(myCorpus, stemDocument, "german")
+  myCorpus <- tm_map(myCorpus, stemCompletion, dictionary = dictCorpus)
+  
+  ###
+  #
+  # Erstelle Dokumentenmatrix
+  #
+  ###
+  myDtm <- TermDocumentMatrix(myCorpus, control = list(minWordLength = 1))
+  return(myDtm)
+}
+
+#################################################################################
+#
+# Plot Wordcloud
+#
+#################################################################################
+
+plot_wc <- function(myDtm, min.freq = 3) {
+  v <- sort(rowSums(as.matrix(myDtm)), decreasing = TRUE)
+  myNames <- names(v)
+  d <- data.frame(word = myNames, freq = v)
+  wordcloud(d$word, d$freq, min.freq = min.freq)
+}
+
+#################################################################################
+#################################################################################
+#################################################################################
+
+
+#################################################################################
+#
+# Example with plots and tables of top ten tweeter
+#
+#################################################################################
+df <- hour_dist("#s21")
 
 ggplot(df) + geom_histogram(aes(x=hourly.count), binwidth=1) + 
   facet_wrap(~date) + xlab("") + ylab("") + xlim(c(0,24))
