@@ -133,10 +133,14 @@ plot_wc <- function(myDtm, min.freq = 3) {
 # Example with plots and tables of top ten tweeter
 #
 #################################################################################
-df <- hour_dist("#s21")
+df <- hour_dist("#syrien", plot = FALSE)
 
 ggplot(df) + geom_histogram(aes(x=hourly.count), binwidth=1) + 
   facet_wrap(~date) + xlab("") + ylab("") + xlim(c(0,24))
+
+dff <- as.data.frame(table(df$user))
+names(df) <- c("a", "b")
+wordcloud(dff[,1], dff[,2], min.freq = 5)
 
 # top ten over all days
 sort(table(df$user), decreasing=T)[1:10]
