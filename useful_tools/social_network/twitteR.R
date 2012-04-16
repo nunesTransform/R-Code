@@ -133,7 +133,11 @@ plot_wc <- function(myDtm, min.freq = 3) {
 # Example with plots and tables of top ten tweeter
 #
 #################################################################################
+<<<<<<< HEAD
 df <- hour_dist("#syrien", plot = FALSE)
+=======
+df <- hour_dist("#iran")
+>>>>>>> 5ce996e02f29aff0dbc1702baa69cc39462be076
 
 ggplot(df) + geom_histogram(aes(x=hourly.count), binwidth=1) + 
   facet_wrap(~date) + xlab("") + ylab("") + xlim(c(0,24))
