@@ -1,3 +1,10 @@
 ggplot2:
 theme_border.R: Half borders (x/y-axis only) in ggplot2
 viewport.R: Arrange multiple ggplot2 plots in the same image window 
+geom_segment2.R: change the standard line ends in geom_segment from “butt” to 
+“round” in order that the lines appeared continuous and not with “cracks” in
+
+social network:
+graph_friendsfollowers.R: plot twitter friends in a graph
+score.R: calculate word score, see e.g. http://www.r-bloggers.com/mining-twitter-for-consumer-attitudes-towards-hotels/
+twitteR.R: R function for getting the hourly count of tweets and tweeter and plotting them
