@@ -6,6 +6,9 @@
 # describtion: i used the unemployment time series from stuttgart to show the 
 # power and beauty of ggplot2  
 #
+# plots can be found on:
+# http://www.simonmueller.net/leistungen/visualisierung_mit_R.html
+#
 #################################################################################
 
 # load libraries
