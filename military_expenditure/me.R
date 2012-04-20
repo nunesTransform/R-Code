@@ -21,9 +21,9 @@ me <- me[order(me$Value, decreasing = TRUE), ]
 europe <- c("Germany", "France", "Greece", "Spain", "Portugal", 
             "Poland", "Greece", "Sweden", "Switzerland", "United Kingdom", 
             "Turkey", "Finland", "Hungary", "Italy", "Norway", "Ukraine")
+mp <- me[which(me$Country.or.Area %in% europe), ]
 
 # centre data
-mp <- me[which(me$Country.or.Area %in% europe), ]
 mp$Value <- mp$Value - mean(mp$Value)
 mp$col <- factor(sign(mp$Value))
 
@@ -31,5 +31,5 @@ mp$col <- factor(sign(mp$Value))
 ggplot(mp) + 
   geom_bar(aes(x = Country.or.Area, y = Value, fill = col)) + 
   coord_flip() +
-  scale_fill_manual (values = c("steelblue", "maroon"), legend=FALSE) +
+  scale_fill_manual (values = c("steelblue", "maroon"), legend = FALSE) +
   ylab(" ") + xlab(" ")
