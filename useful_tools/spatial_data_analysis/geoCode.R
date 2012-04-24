@@ -27,10 +27,9 @@ getGeoCode <- function(gcStr) {
   #Flatten the received JSON
   data.json <- unlist(data.json)
   if(data.json["status"]=="OK") {
-    lat <- data.json["results.geometry.location.lat"]
-    lng <- data.json["results.geometry.location.lng"]
-    gcodes <- c(lat, lng)
-    names(gcodes) <- c("Lat", "Lng")
+    lat <- as.numeric(data.json["results.geometry.location.lat"])
+    lng <- as.numeric(data.json["results.geometry.location.lng"])
+    gcodes <- data.frame(city = gcStr, lat = lat, lng = lng)
     return (gcodes)
   }
 }
